@@ -66,6 +66,8 @@ function connectNative() {
         return;
     }
 
+    broadcastBridgeState(true);
+
     // Messages from the Python HTTP server
     nativePort.onMessage.addListener((msg) => {
         if (msg.type === 'api_request' || msg.type === 'api_request_chunk') {
@@ -88,7 +90,19 @@ function connectNative() {
     nativePort.onDisconnect.addListener(() => {
         console.warn('[Proxy] Native host disconnected, reconnecting...');
         nativePort = null;
+        broadcastBridgeState(false);
         setTimeout(connectNative, 2000);
+    });
+}
+
+// Tell every Gemini tab (via content scripts) whether the native host is
+// connected, so the Canvas page can show an honest online/offline status.
+function broadcastBridgeState(connected) {
+    chrome.tabs.query({ url: 'https://gemini.google.com/*' }, (tabs) => {
+        for (const tab of tabs) {
+            chrome.tabs.sendMessage(tab.id, { type: 'bridge_state', connected })
+                .catch(() => {});
+        }
     });
 }
 

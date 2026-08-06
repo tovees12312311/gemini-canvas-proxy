@@ -359,7 +359,28 @@ function App() {
 
         function handleMessage(event) {
             var data = event.data;
-            if (!data || data.source !== 'gemini-proxy-request') return;
+            if (!data) return;
+
+            // Relay acknowledged our port — the extension chain is alive.
+            if (data.source === 'gemini-proxy-ack') {
+                setStatus('online');
+                addLog('info', 'Extension relay connected — proxy active', 'info');
+                return;
+            }
+
+            // Native host connect/disconnect state relayed from background.
+            if (data.source === 'gemini-proxy-state') {
+                if (data.connected) {
+                    setStatus('online');
+                    addLog('info', 'Native host connected', 'info');
+                } else {
+                    setStatus('offline');
+                    addLog('error', 'Native host disconnected', 'error');
+                }
+                return;
+            }
+
+            if (data.source !== 'gemini-proxy-request') return;
 
             var id = data.id;
             var method = data.method || 'POST';
@@ -424,8 +445,10 @@ function App() {
         channel.port1.start();
         var timer = setTimeout(function() {
             window.parent.postMessage({ source: 'gemini-proxy-ready' }, '*', [channel.port2]);
-            setStatus('online');
-            addLog('info', 'Proxy ready — waiting for requests', 'info');
+            addLog('info', 'Handshake sent — waiting for extension relay...', 'info');
+            // Status stays 'waiting' until the content script acks the port
+            // (gemini-proxy-ack) or the native host state arrives. Do NOT
+            // claim 'online' unconditionally — the relay may not exist.
         }, 500);
         return function() {
             clearTimeout(timer);

@@ -31,10 +31,20 @@ window.addEventListener('message', (event) => {
         });
     };
     proxyPort.start();
+    // Acknowledge the port so the Canvas page knows the relay chain is alive.
+    // Until this ack arrives, the page shows "waiting" instead of a fake "online".
+    proxyPort.postMessage({ source: 'gemini-proxy-ack' });
     chrome.runtime.sendMessage({ type: 'page_ready' });
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'bridge_state' && proxyPort) {
+        proxyPort.postMessage({
+            source: 'gemini-proxy-state',
+            connected: Boolean(message.connected)
+        });
+        return;
+    }
     if (message.type !== 'api_request' || !proxyPort) return;
 
     proxyPort.postMessage({
