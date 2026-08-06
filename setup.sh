@@ -27,7 +27,7 @@ if [ ! -f "$HOST_SCRIPT" ]; then
 fi
 
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║          ⚡  Gemini Canvas Proxy — Setup  ⚡                  ║"
+echo "║        Gemini Canvas Proxy — Setup                           ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -144,7 +144,7 @@ fi
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║                    ✅  Setup Complete  ✅                     ║"
+echo "║                  Setup Complete                              ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo ""
 echo "Next steps:"
@@ -157,7 +157,7 @@ echo "  5. Switch to the Code tab (top of the Canvas panel)"
 echo "  6. Select all generated code → delete it"
 echo "  7. Open canvas-proxy.html from this project"
 echo "  8. Copy ALL contents → paste into Canvas code editor"
-echo "  9. Click Preview — you should see '⚡ Gemini Canvas Proxy'"
+echo "  9. Click Preview — you should see 'Gemini Canvas Proxy'"
 echo "     with a green 'Proxy Active' status"
 echo ""
 echo "  10. Test the proxy:"
