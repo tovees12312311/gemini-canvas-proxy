@@ -61,7 +61,7 @@ echo "✓ Extension ID: $EXTENSION_ID"
 GENERATED_MANIFEST=$(cat << EOF
 {
     "name": "$NATIVE_HOST_NAME",
-    "description": "Gemini Canvas Proxy — free unlimited LLM API via Canvas postMessage bridge",
+    "description": "Gemini Canvas Proxy — free unlimited LLM API via Canvas MessageChannel bridge",
     "path": "$HOST_SCRIPT",
     "type": "stdio",
     "allowed_origins": ["chrome-extension://$EXTENSION_ID/"]

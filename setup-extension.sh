@@ -55,7 +55,7 @@ mkdir -p "$NATIVE_HOST_DIR"
 cat > "$MANIFEST_PATH" <<EOF
 {
     "name": "com.gemini.proxy",
-    "description": "Gemini Canvas Proxy — free unlimited LLM API via Canvas postMessage bridge",
+    "description": "Gemini Canvas Proxy — free unlimited LLM API via Canvas MessageChannel bridge",
     "path": "$HOST_SCRIPT",
     "type": "stdio",
     "allowed_origins": ["chrome-extension://$EXTENSION_ID/"]

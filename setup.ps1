@@ -2,6 +2,15 @@
 # Gemini Canvas Proxy — Setup Script (Windows PowerShell)
 # ═══════════════════════════════════════════════════════════════════════════
 # Run in PowerShell: .\setup.ps1
+#
+# This script:
+#   1. Verifies Python is installed
+#   2. Generates (or reuses) the bearer token for the HTTP API
+#   3. Asks for the Chrome extension ID (after you load the extension)
+#   4. Creates a .bat wrapper and installs the native messaging host
+#      manifest in the registry for Chrome, Chromium, and Edge
+#
+# Works on: Windows 10/11, PowerShell 5.1+
 # ═══════════════════════════════════════════════════════════════════════════
 
 $ErrorActionPreference = "Stop"
@@ -11,6 +20,13 @@ $NativeHostName = "com.gemini.proxy"
 $HostScript = Join-Path $ScriptDir "native_host\gemini_proxy.py"
 $HostScriptWin = $HostScript -replace "/", "\"
 $TokenFile = Join-Path $ScriptDir "native_host\.proxy_token"
+
+# Sanity check: make sure we're in the right directory
+if (-not (Test-Path $HostScript)) {
+    Write-Host "[ERROR] gemini_proxy.py not found at $HostScript" -ForegroundColor Red
+    Write-Host "  Make sure you're running this from the gemini-canvas-proxy directory." -ForegroundColor Red
+    exit 1
+}
 
 Write-Host ""
 Write-Host "==================================================" -ForegroundColor Cyan
@@ -72,7 +88,7 @@ Write-Host "[OK] Created wrapper: $BatchPath" -ForegroundColor Green
 
 $Manifest = @{
     name = $NativeHostName
-    description = "Gemini Canvas Proxy - free unlimited LLM API via Canvas postMessage bridge"
+    description = "Gemini Canvas Proxy - free unlimited LLM API via Canvas MessageChannel bridge"
     path = $BatchPath
     type = "stdio"
     allowed_origins = @("chrome-extension://$ExtensionId/")
@@ -130,18 +146,21 @@ Write-Host ""
 Write-Host "Next steps:"
 Write-Host ""
 Write-Host "  1. Go to gemini.google.com"
-Write-Host "  2. Tell Gemini: 'Create a web app'"
-Write-Host "  3. Switch to the Code tab"
-Write-Host "  4. Delete all generated code"
-Write-Host "  5. Open canvas-proxy.html, copy ALL contents"
-Write-Host "  6. Paste into Canvas code editor"
-Write-Host "  7. Click Preview - you should see the proxy UI"
+Write-Host "  2. Click the '+' icon (left of the prompt bar)"
+Write-Host "  3. Select 'Canvas' from the menu"
+Write-Host "  4. Type: Create an HTML web app"
+Write-Host "  5. Switch to the Code tab (top of the Canvas panel)"
+Write-Host "  6. Select all generated code -> delete it"
+Write-Host "  7. Open canvas-proxy.html from this project"
+Write-Host "  8. Copy ALL contents -> paste into Canvas code editor"
+Write-Host "  9. Click Preview - you should see '⚡ Gemini Canvas Proxy'"
+Write-Host "     with a green 'Proxy Active' status"
 Write-Host ""
-Write-Host "  8. Test:"
+Write-Host "  10. Test the proxy:"
 Write-Host "     curl http://127.0.0.1:8765/v1/chat/completions -H `"Authorization: Bearer $ProxyToken`" -H `"Content-Type: application/json`" -d `"{\`"model\`":\`"gemini-3-flash-preview\`",\`"messages\`":[{\`"role\`":\`"user\`",\`"content\`":\`"Hello!\`"}]}`""
 Write-Host ""
 Write-Host "  Bearer token: $ProxyToken"
 Write-Host "  Keep this token private; clients must send it as their API key."
 Write-Host ""
-Write-Host "  9. See README.md for integration with Hermes, OpenClaw, etc."
+Write-Host "  11. See README.md for integration with Hermes, OpenClaw, etc."
 Write-Host ""
