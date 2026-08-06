@@ -14,6 +14,7 @@ setup.ps1
 stop.sh
 vps_setup.md
 canvas-proxy.html
+docs/
 
 # Extension lives on the host, not in the container
 extension/

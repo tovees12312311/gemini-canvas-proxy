@@ -113,6 +113,16 @@ chromium \
     >/tmp/chromium.log 2>&1 &
 CHROMIUM_PID=$!
 
+# ── 3b. Managed policy check ──────────────────────────────────────────────────
+# If the BrowserSignin=0 policy is missing (e.g. someone built the image with
+# an old Dockerfile or mounted over /etc/chromium), log a hint. The policy is
+# what prevents Google's Account Reconcilor from wiping the cookie session
+# on restart — without it, login may not survive.
+if [ ! -f /etc/chromium/policies/managed/gemini-proxy-signin.json ]; then
+    echo "[entrypoint] WARNING: chromium policy gemini-proxy-signin.json not found —"
+    echo "[entrypoint]          login may not survive container restarts (BrowserSignin=0 missing)" >&2
+fi
+
 # ── 4. x11vnc ─────────────────────────────────────────────────────────────────
 # Passwordless VNC — this is a single-user container. If you're exposing
 # the VNC port to a network, set VNC_PASSWORD via an env var or a docker
