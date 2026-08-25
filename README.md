@@ -11,8 +11,10 @@ Turns a free Gemini Canvas session into a local OpenAI-compatible endpoint at `h
 ```bash
 git clone https://github.com/pranrichh/gemini-canvas-proxy.git
 cd gemini-canvas-proxy
-./setup.sh              # Windows: .\setup.ps1
+./setup.sh              # Windows: .\setup.ps1   |   WSL + Windows Chrome: ./setup-wsl.sh
 ```
+
+> **WSL users:** if your repo lives in WSL but Chrome runs on Windows (the usual setup), `./setup.sh` will NOT work — Windows Chrome discovers native messaging hosts through the Windows registry, not `~/.config` inside WSL. Run `./setup-wsl.sh` instead: it writes a `wsl.exe` wrapper and registers it on the Windows side, while the Python host and the API keep running inside WSL at `127.0.0.1:8765`.
 
 1. Load the extension: `chrome://extensions` → Developer mode → Load unpacked → `extension/`. Paste the Extension ID when the setup script asks.
 2. Open [gemini.google.com](https://gemini.google.com) → Canvas → "Create an HTML web app" → paste `canvas-proxy.html` into the code view → Preview.

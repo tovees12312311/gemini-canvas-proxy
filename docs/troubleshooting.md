@@ -14,6 +14,23 @@ Common errors, their causes, and fixes.
 - If using **Chromium snap** (Ubuntu), the manifest must be in `~/snap/chromium/common/chromium/NativeMessagingHosts/` — the setup script handles this automatically
 - Verify the `path` in the manifest points to the correct absolute path of `gemini_proxy.py`
 - Extension IDs must be exactly 32 characters from `[a-p]` — the setup scripts now reject anything else
+- **WSL with Windows Chrome**: `./setup.sh` installs manifests into `~/.config` *inside WSL*, which Windows Chrome never reads. Use `./setup-wsl.sh` — it registers the host in the Windows registry with a `wsl.exe` wrapper. Fully restart Chrome afterwards (`chrome://restart`); Chrome only reads those registry keys at startup.
+
+## WSL: extension loads but the proxy never connects
+
+Symptoms: extension service-worker console shows `Specified native messaging host not found` or the port disconnects instantly.
+
+1. Confirm you ran `./setup-wsl.sh` (not `./setup.sh`) and restarted Chrome completely — closing the window isn't enough if Chrome keeps running in the tray.
+2. Check the registry entry exists (from WSL):
+   ```bash
+   reg.exe query 'HKCU\Software\Google\Chrome\NativeMessagingHosts\com.gemini.proxy' /ve
+   ```
+3. Test the wrapper by hand from PowerShell — it should hang silently (the host is waiting on stdin), not print a Python error:
+   ```powershell
+   & "$env:LOCALAPPDATA\GeminiCanvasProxy\gemini_proxy.bat"
+   ```
+4. If `wsl.exe` errors, verify the distro name baked into the `.bat` matches `wsl.exe -l -v` output.
+5. Reaching the API from Windows: use `http://localhost:8765` — WSL2 forwards localhost automatically. If that fails (older builds / mirrored-networking quirks), curl from inside WSL, or use the WSL IP shown by `hostname -I`.
 
 ## 401 from Gemini API
 
