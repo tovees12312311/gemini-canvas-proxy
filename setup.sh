@@ -31,6 +31,29 @@ echo "║        Gemini Canvas Proxy — Setup                           ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo ""
 
+# ── WSL detection ─────────────────────────────────────────────────────────────
+# Under WSL, the browser almost always runs on WINDOWS. Windows Chrome reads
+# native messaging manifests from the Windows registry — not from ~/.config
+# inside WSL — so this script's manifests would be invisible to it.
+
+if grep -qiE '(microsoft|wsl)' /proc/version 2>/dev/null; then
+    echo "⚠ WSL detected."
+    echo ""
+    echo "  If your Chrome/Edge runs on WINDOWS (the usual case), this script"
+    echo "  will NOT work — Windows browsers can't see manifests installed"
+    echo "  inside WSL. Run ./setup-wsl.sh instead."
+    echo ""
+    echo "  Only continue if your browser runs INSIDE WSL (WSLg / Linux Chrome)."
+    echo ""
+    read -p "  Continue with the Linux setup anyway? [y/N] " WSL_CONTINUE
+    if ! [[ "$WSL_CONTINUE" =~ ^[Yy]$ ]]; then
+        echo ""
+        echo "  → Run: ./setup-wsl.sh"
+        exit 0
+    fi
+    echo ""
+fi
+
 # ── Step 1: Make the Python host executable ──────────────────────────────────
 
 chmod +x "$HOST_SCRIPT"
